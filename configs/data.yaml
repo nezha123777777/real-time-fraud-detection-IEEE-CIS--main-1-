@@ -1,0 +1,67 @@
+# configs/data.yaml
+# Controls data loading, merging, validation, and cleaning behaviour.
+
+loading:
+  # Columns to read (null = read all columns)
+  usecols: null
+  # Number of rows for quick-dev runs (null = full dataset)
+  nrows: 10000
+  # Dtypes to force on load to save memory
+  dtype_overrides:
+    TransactionID: "int32"
+    isFraud: "int8"
+    TransactionDT: "int32"
+    TransactionAmt: "float32"
+    ProductCD: "category"
+
+merging:
+  # Join key between transaction and identity tables
+  join_key: "TransactionID"
+  # Join type — LEFT keeps all transactions; identity may be missing
+  join_how: "left"
+
+validation:
+  # Columns that must exist after merge
+  required_columns:
+    - "TransactionID"
+    - "isFraud"
+    - "TransactionDT"
+    - "TransactionAmt"
+    - "ProductCD"
+    - "card1"
+    - "card4"
+    - "card6"
+    - "addr1"
+  # Target must be binary
+  target_column: "isFraud"
+  target_values: [0, 1]
+  # TransactionID must be unique
+  unique_id_column: "TransactionID"
+
+cleaning:
+  # Drop columns whose missingness exceeds this fraction
+  max_missing_fraction: 0.50
+  # Columns to always keep regardless of missingness
+  protected_columns:
+    - "TransactionID"
+    - "isFraud"
+    - "TransactionDT"
+    - "TransactionAmt"
+  # Columns to force-drop (known useless or high-cardinality junk)
+  force_drop_columns: []
+  # Dtype corrections applied after cleaning
+  category_columns:
+    - "ProductCD"
+    - "card4"
+    - "card6"
+    - "P_emaildomain"
+    - "R_emaildomain"
+    - "M1"
+    - "M2"
+    - "M3"
+    - "M4"
+    - "M5"
+    - "M6"
+    - "M7"
+    - "M8"
+    - "M9"

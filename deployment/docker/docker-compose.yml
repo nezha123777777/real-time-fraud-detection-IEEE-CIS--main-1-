@@ -1,0 +1,155 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.2
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.2
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: frauduser
+      POSTGRES_PASSWORD: fraudpass
+      POSTGRES_DB: frauddb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U frauduser -d frauddb"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  api:
+    build:
+      context: ../..
+      dockerfile: deployment/Dockerfile
+    env_file: ../../.env
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - POSTGRES_HOST=postgres
+      - FRAUD_API_URL=http://api:8000
+    depends_on:
+      kafka:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    command: ["uvicorn", "deployment.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    working_dir: /app
+
+  consumer:
+    build:
+      context: ../..
+      dockerfile: deployment/Dockerfile
+    env_file: ../../.env
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - POSTGRES_HOST=postgres
+      - FRAUD_API_URL=http://api:8000
+      - KAFKA_DLQ_TOPIC=fraud_dlq
+    command: ["python", "-m", "deployment.kafka.consumer"]
+    working_dir: /app
+    depends_on:
+      api:
+        condition: service_started
+      kafka:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      disable: true
+
+  producer:
+    build:
+      context: ../..
+      dockerfile: deployment/Dockerfile
+    env_file: ../../.env
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    volumes:
+      - ../../data/interim:/app/data/interim:ro
+    command: ["python", "-m", "deployment.kafka.producer", "--limit", "200", "--sleep", "0.05"]
+    depends_on:
+      - kafka
+    working_dir: /app
+    healthcheck:
+      disable: true
+
+  dashboard:
+    build:
+      context: ../..
+      dockerfile: deployment/Dockerfile
+    env_file: ../../.env
+    environment:
+      - POSTGRES_HOST=postgres
+      - FRAUD_API_URL=http://api:8000
+      - STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
+    ports:
+      - "8501:8501"
+    command: ["streamlit", "run", "deployment/dashboard/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      consumer:
+        condition: service_started
+    working_dir: /app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  mlflow:
+    build:
+      context: ../..
+      dockerfile: deployment/Dockerfile.mlflow
+    ports:
+      - "5050:5050"
+    volumes:
+      - ../../mlflow.db:/app/mlflow.db
+      - ../../mlruns:/app/mlruns
+    command:
+      [
+        "mlflow",
+        "server",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "5050",
+        "--backend-store-uri",
+        "sqlite:////app/mlflow.db",
+        "--default-artifact-root",
+        "mlflow-artifacts:/",
+        "--artifacts-destination",
+        "/app/mlruns",
+      ]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5050/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:

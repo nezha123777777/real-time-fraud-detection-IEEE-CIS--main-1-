@@ -1,0 +1,51 @@
+# Data and generated outputs
+data/raw/
+data/interim/
+data/processed/
+data/external/
+artifacts/
+logs/
+reports/figures/
+reports/metrics/
+reports/tables/
+reports/final_report/
+
+# Python cache and build files
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local environment files
+.env
+
+# Notebook cache
+.ipynb_checkpoints/
+
+# Editor / OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Local assistant notes
+AGENTS.md
+
+# Local experiments / temp files
+mlruns/
+tmp_*.onnx
+tmp_*.json
+reports/plan_detection_fraude_extracted.txt

@@ -1,0 +1,30 @@
+# configs/split.yaml
+# Chronological train / validation / test split configuration.
+
+# ────────────────────────────────────────────────────────────
+# IMPORTANT — we split by TransactionDT (elapsed seconds from
+# a reference point).  This prevents data leakage that would
+# occur with a random split, because fraud patterns drift over
+# time and a random split would let the model "see the future".
+# ────────────────────────────────────────────────────────────
+
+time_column: "TransactionDT"
+
+# Proportions (must sum to 1.0)
+train_fraction: 0.70
+valid_fraction: 0.15
+test_fraction:  0.15
+
+# Alternative: explicit percentile boundaries.
+# If set, these override the fractions above.
+# train_end_percentile: 70
+# valid_end_percentile: 85
+
+# Safety checks after splitting
+checks:
+  # Verify no time overlap between splits
+  assert_no_time_overlap: true
+  # Verify no TransactionID overlap
+  assert_no_id_overlap: true
+  # Log split statistics
+  log_split_stats: true

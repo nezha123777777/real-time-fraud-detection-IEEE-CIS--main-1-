@@ -1,0 +1,44 @@
+
+O
+/
+__dummy"
+__dummy_idJieee_fraud_feature_store
+··şÎèÏ”··şÎèÏ”
+w
+W
+transactionA unique transaction identifier"TransactionIDJieee_fraud_feature_store
+··şÎèÏ”··şÎèÏ”
+l
+L
+card#The primary card identifier (card1)"card1Jieee_fraud_feature_store
+··şÎèÏ”··şÎèÏ”1"$c03f3d4b-03e3-4a0d-b680-d1fe5779a069*··şÎ€ÿÏ”2‹
+ê
+	card_infoieee_fraud_feature_storecard"	
+card2"	
+card3"	
+card5"	
+addr12€ç„:üevent_timestampZYWc:/Users/User/Documents/pfa/ieee_fraud_project/data/interim/feature_ready_train.parquetŠ1feast.infra.offline_stores.file_source.FileSource¢Wc:/Users/User/Documents/pfa/ieee_fraud_project/data/interim/feature_ready_train.parquet@b	
+card1
+··şÎ€ÿÏ”··şÎ€ÿÏ”2ı
+Ü
+transaction_statsieee_fraud_feature_storetransaction"
+TransactionAmt"
+log_TransactionAmt"
+amt_decimal"
+amt_is_round"
+hour"
+day_of_week"
+
+is_weekend"
+is_night2€£:üevent_timestampZYWc:/Users/User/Documents/pfa/ieee_fraud_project/data/interim/feature_ready_train.parquetŠ1feast.infra.offline_stores.file_source.FileSource¢Wc:/Users/User/Documents/pfa/ieee_fraud_project/data/interim/feature_ready_train.parquet@b
+TransactionID
+··şÎ€ÿÏ”··şÎ€ÿÏ”RÚ
+¦
+,feast.infra.online_stores.sqlite.SqliteTable"v
+PC:\Users\User\Documents\pfa\ieee_fraud_project\feature_repo\data\online_store.db"ieee_fraud_feature_store_card_info
+®
+,feast.infra.online_stores.sqlite.SqliteTable"~
+PC:\Users\User\Documents\pfa\ieee_fraud_project\feature_repo\data\online_store.db*ieee_fraud_feature_store_transaction_statsb—event_timestampZYWc:/Users/User/Documents/pfa/ieee_fraud_project/data/interim/feature_ready_train.parquetŠ1feast.infra.offline_stores.file_source.FileSource¢Wc:/Users/User/Documents/pfa/ieee_fraud_project/data/interim/feature_ready_train.parquetªieee_fraud_feature_storeŠ:
+
+ieee_fraud_feature_store
+··şÎ˜“Ù€··şÎ˜“Ù€
